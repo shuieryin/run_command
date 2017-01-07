@@ -1,0 +1,27 @@
+## Name of the node
+-name run_command@runcommand.local
+
+## Cookie for distributed erlang, the cookie name has to be identical to app
+## name because below -setcookie only works for maintenance processes, hence
+## run_command_sup:init/1 sets the cookie name to app name
+-setcookie run_command
+
+## Heartbeat management; auto-restarts VM if it dies or becomes unresponsive
+## (Disabled by default..use with caution!)
+##-heart
+
+## Enable kernel poll and a few async threads
+##+K true
+##+A 5
+
+## Increase number of concurrent ports/sockets
+##-env ERL_MAX_PORTS 4096
+
+## Tweak GC to run more often
+##-env ERL_FULLSWEEP_AFTER 10
+
+## Printable characters
++pc unicode
+
+## Sasl
+start_sasl

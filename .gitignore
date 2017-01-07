@@ -1,0 +1,20 @@
+# Created by .ignore support plugin (hsz.mobi)
+### Erlang template
+.eunit
+deps
+*.o
+*.beam
+*.plt
+erl_crash.dump
+ebin/*.beam
+rel/example_project
+.concrete/DEV_MODE
+.rebar
+*.iml
+.idea
+out
+ebin
+_build
+rebar3.crashdump
+rebar.lock
+dump.rdb
