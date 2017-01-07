@@ -1,7 +1,7 @@
-{application,run_command,
-             [{vsn,"0.1.0"},
-              {description,"Run commands"},
-              {registered,[]},
-              {applications,[kernel,stdlib,ranch]},
-              {mod,{run_command_app,["run_command"]}},
-              {env,[]}]}.
+{application, run_command,
+    [{vsn, "0.1.0"},
+        {description, "Run commands"},
+        {registered, []},
+        {applications, [kernel, stdlib, ranch, inets]},
+        {mod, {run_command_app, ["run_command"]}},
+        {env, []}]}.
