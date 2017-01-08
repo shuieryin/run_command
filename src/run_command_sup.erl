@@ -68,14 +68,6 @@ init([AppName]) ->
     {ok, {
         SupFlags,
         [
-            {redis_client_server,
-                {redis_client_server, start_link, []},
-                permanent,
-                10000,
-                worker,
-                [redis_client_server]
-            },
-
             {run_command_server,
                 {run_command_server, start_link, []},
                 permanent,

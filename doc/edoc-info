@@ -1,3 +1,0 @@
-%% encoding: UTF-8
-{application,run_command}.
-{modules,[run_command_app,run_command_server,run_command_sup]}.

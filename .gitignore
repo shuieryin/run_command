@@ -19,3 +19,4 @@ rebar3.crashdump
 rebar.lock
 dump.rdb
 config/rebar3
+doc
