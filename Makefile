@@ -8,7 +8,7 @@ install:
 	@./config/rebar3 install
 
 run:
-	@redis-server & ./_build/default/rel/run_command/bin/run_command console
+	@./_build/default/rel/run_command/bin/run_command console
 
 build:
 	@./config/rebar3 build
