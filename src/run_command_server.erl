@@ -134,14 +134,10 @@ handle_command(Socket, Acceptor) ->
             Acceptor ! {start_accept, Acceptor};
         {tcp, Socket, <<0, _Type, Msg/binary>>} ->
             io:format("Msg:~p~n", [Msg]),
-            spawn(elib, cmd,
-                [
-                    binary_to_list(Msg),
-                    fun(OutputBin) ->
-                        ranch_tcp:send(Socket, <<OutputBin/binary, "\n">>),
-                        ranch_tcp:send(Socket, <<"done\n">>)
-                    end
-                ]
+            elib:cmd(binary_to_list(Msg),
+                fun(OutputBin) ->
+                    ranch_tcp:send(Socket, <<OutputBin/binary, "\n">>)
+                end
             ),
 
             ranch_tcp:send(Socket, <<"done\n">>),
