@@ -132,7 +132,7 @@ handle_command(Socket, Acceptor) ->
             ranch_tcp:send(Socket, <<"closed\n">>),
             ranch_tcp:close(Socket),
             Acceptor ! {start_accept, Acceptor};
-        {tcp, Socket, <<0, _Type, MsgBin/binary>>} ->
+        {tcp, Socket, <<_Ind, _Type, MsgBin/binary>>} ->
             io:format("Encoded request: [~p]~n", [MsgBin]),
             Msg = base64:decode(MsgBin),
             io:format("Msg:~p~n", [Msg]),
@@ -140,7 +140,6 @@ handle_command(Socket, Acceptor) ->
                 fun(RawOutputBin) ->
                     io:format("~p~n", [RawOutputBin]),
                     OutputBin = base64:encode(RawOutputBin),
-                    io:format("Encoded response: [~p]~n", [OutputBin]),
                     ranch_tcp:send(Socket, <<OutputBin/binary, "\n">>)
                 end
             ),
