@@ -136,6 +136,7 @@ handle_command(Socket, Acceptor) ->
             io:format("Msg:~p~n", [Msg]),
             elib:cmd(binary_to_list(Msg),
                 fun(OutputBin) ->
+                    io:format("~p~n", [OutputBin]),
                     ranch_tcp:send(Socket, <<OutputBin/binary, "\n">>)
                 end
             ),
