@@ -129,7 +129,7 @@ handle_command(Socket, Acceptor) ->
     receive
         {tcp, Socket, <<0, _Type, "close", _Rest/binary>>} ->
             io:format("closing socket:~p~n", [Socket]),
-            ranch_tcp:send(Socket, <<"closed\n">>),
+            ranch_tcp:send(Socket, encode_response(<<"closed">>)),
             ranch_tcp:close(Socket),
             Acceptor ! {start_accept, Acceptor};
         {tcp, Socket, <<_Ind, _Type, MsgBin/binary>>} ->
@@ -138,8 +138,7 @@ handle_command(Socket, Acceptor) ->
             elib:cmd(binary_to_list(Msg),
                 fun(RawOutputBin) ->
                     io:format("~p~n", [RawOutputBin]),
-                    OutputBin = base64:encode(RawOutputBin),
-                    ranch_tcp:send(Socket, <<OutputBin/binary, "\n">>)
+                    ranch_tcp:send(Socket, encode_response(RawOutputBin))
                 end
             ),
 
@@ -277,5 +276,18 @@ format_status(Opt, StatusData) ->
     gen_server:format_status(Opt, StatusData).
 
 %%%===================================================================
-%%% Internal functions (N/A)
+%%% Internal functions
 %%%===================================================================
+
+%%--------------------------------------------------------------------
+%% @doc
+%% Encode response message.
+%%
+%% @end
+%%--------------------------------------------------------------------
+-spec encode_response(RawBin) -> EncodedBin when
+    RawBin :: binary(),
+    EncodedBin :: binary().
+encode_response(RawBin) ->
+    EcnodedBin = base64:encode(RawBin),
+    <<EcnodedBin/binary, "\n">>.
