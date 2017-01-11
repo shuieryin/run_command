@@ -133,7 +133,6 @@ handle_command(Socket, Acceptor) ->
             ranch_tcp:close(Socket),
             Acceptor ! {start_accept, Acceptor};
         {tcp, Socket, <<_Ind, _Type, MsgBin/binary>>} ->
-            io:format("Encoded request: [~p]~n", [MsgBin]),
             Msg = base64:decode(MsgBin),
             io:format("Msg:~p~n", [Msg]),
             elib:cmd(binary_to_list(Msg),
