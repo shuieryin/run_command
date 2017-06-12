@@ -18,7 +18,9 @@
 -export([
     start_link/0,
     handle_command/2,
-    acceptor/2
+    handle_command/1,
+    acceptor/2,
+    collect_command_output/2
 ]).
 
 %% gen_server callbacks
@@ -34,6 +36,7 @@
 
 -define(SERVER, ?MODULE).
 -define(COMMAND_LISTENER, incoming_commands).
+-define(EMPTY_CONTENT, <<>>).
 
 -record(state, {
     socket :: gen_tcp:socket()
@@ -141,9 +144,60 @@ handle_command(Socket, Acceptor) ->
                     ranch_tcp:send(Socket, encode_response(RawOutputBin))
                 end
             ),
-
-            ranch_tcp:send(Socket, <<"done\n">>),
             handle_command(Socket, Acceptor)
+    end.
+
+%%--------------------------------------------------------------------
+%% @doc
+%% Handle comment from http
+%%
+%% @end
+%%--------------------------------------------------------------------
+-spec handle_command(Req :: cowboy_req:req()) -> {iodata(), cowboy_req:req()}.
+handle_command(Req) ->
+    case cowboy_req:qs(Req) of
+        ?EMPTY_CONTENT ->
+            ok;
+        HeaderParams ->
+            error_logger:info_msg("==========HeaderParams:~n~p~n", [HeaderParams])
+    end,
+
+    {ok, CommandBin, UpdatedReq} = cowboy_req:read_body(Req),
+    ReturnMessage =
+        case CommandBin of
+            ?EMPTY_CONTENT ->
+                ?EMPTY_CONTENT;
+            _HasContent ->
+                Self = self(),
+                CollectOutputPid = spawn(?MODULE, collect_command_output, [Self, []]),
+                elib:cmd(binary_to_list(CommandBin),
+                    fun(RawOutputBin) ->
+                        CollectOutputPid ! {collect, CollectOutputPid, RawOutputBin},
+                        io:format("~p~n", [RawOutputBin])
+                    end
+                ),
+
+                receive
+                    {output, CollectOutputPid, OutputList} ->
+                        jsx:encode(OutputList)
+                end
+        end,
+    {ReturnMessage, UpdatedReq}.
+
+%%--------------------------------------------------------------------
+%% @doc
+%% Collect all outputs from elib cmd
+%%
+%% @end
+%%--------------------------------------------------------------------
+-spec collect_command_output(pid(), [binary()]) -> no_return().
+collect_command_output(ReturnPid, AccOutputList) ->
+    Self = self(),
+    receive
+        {collect, Self, <<"done\n">> = Done} ->
+            ReturnPid ! {output, Self, lists:reverse([Done | AccOutputList])};
+        {collect, Self, OutputLine} ->
+            collect_command_output(ReturnPid, [OutputLine | AccOutputList])
     end.
 
 %%--------------------------------------------------------------------
