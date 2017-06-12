@@ -162,14 +162,17 @@ handle_command(Req) ->
             error_logger:info_msg("==========HeaderParams:~n~p~n", [HeaderParams])
     end,
 
-    {ok, CommandBin, UpdatedReq} = cowboy_req:read_body(Req),
+    {ok, RawCommandBin, UpdatedReq} = cowboy_req:read_body(Req),
     ReturnMessage =
-        case CommandBin of
+        case RawCommandBin of
             ?EMPTY_CONTENT ->
                 ?EMPTY_CONTENT;
             _HasContent ->
                 Self = self(),
                 CollectOutputPid = spawn(?MODULE, collect_command_output, [Self, []]),
+                #{
+                    <<"command">> := CommandBin
+                } = jsx:decode(RawCommandBin, [return_maps]),
                 elib:cmd(binary_to_list(CommandBin),
                     fun(RawOutputBin) ->
                         CollectOutputPid ! {collect, CollectOutputPid, RawOutputBin},
