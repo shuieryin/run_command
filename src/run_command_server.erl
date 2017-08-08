@@ -35,7 +35,6 @@
 ]).
 
 -define(SERVER, ?MODULE).
--define(COMMAND_LISTENER, incoming_commands).
 -define(EMPTY_CONTENT, <<>>).
 
 -record(state, {
@@ -142,7 +141,7 @@ handle_command(Socket, Acceptor) ->
                 fun(RawOutputBin) ->
                     io:format("~p~n", [RawOutputBin]),
                     ranch_tcp:send(Socket, encode_response(RawOutputBin))
-                end
+                end, []
             ),
             handle_command(Socket, Acceptor)
     end.
@@ -177,7 +176,7 @@ handle_command(Req) ->
                     fun(RawOutputBin) ->
                         CollectOutputPid ! {collect, CollectOutputPid, RawOutputBin},
                         io:format("~p~n", [RawOutputBin])
-                    end
+                    end, []
                 ),
 
                 receive
