@@ -84,7 +84,7 @@ init([]) ->
 
     process_flag(trap_exit, true),
 
-    {ok, ListenSocket} = ranch_tcp:listen([{port, 12345}, {keepalive, true}]),
+    {ok, ListenSocket} = ranch_tcp:listen([{port, 12346}, {keepalive, true}]),
 
     spawn(?MODULE, acceptor, [ListenSocket, true]),
 
