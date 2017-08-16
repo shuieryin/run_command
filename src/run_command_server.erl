@@ -138,7 +138,7 @@ handle_command(Socket, Acceptor) ->
             Msg = base64:decode(MsgBin),
             io:format("Msg:~p~n", [Msg]),
             elib:cmd(binary_to_list(Msg),
-                fun(RawOutputBin) ->
+                fun(RawOutputBin, _CustomArgs) ->
                     io:format("~p~n", [RawOutputBin]),
                     ranch_tcp:send(Socket, encode_response(RawOutputBin))
                 end, []
@@ -173,7 +173,7 @@ handle_command(Req) ->
                     <<"command">> := CommandBin
                 } = jsx:decode(RawCommandBin, [return_maps]),
                 elib:cmd(binary_to_list(CommandBin),
-                    fun(RawOutputBin) ->
+                    fun(RawOutputBin, _CustomArgs) ->
                         CollectOutputPid ! {collect, CollectOutputPid, RawOutputBin},
                         io:format("~p~n", [RawOutputBin])
                     end, []
