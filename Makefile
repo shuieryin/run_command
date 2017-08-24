@@ -8,7 +8,7 @@ install:
 	@./config/rebar3 install
 
 run:
-	@./_build/default/rel/run_command/bin/run_command console
+	@export ERL_EPMD_PORT=14369; ./_build/default/rel/run_command/bin/run_command console
 
 build:
 	@./config/rebar3 build
